@@ -7,10 +7,10 @@
 </head>
 <style>
 .wtext {
-    color:antiquewhite
+    color: antiquewhite;
 }
 .wtext1 {
-    color:blanchedalmond
+    color: blanchedalmond;
 }
 </style>
 <body>    
@@ -21,15 +21,21 @@
             <th><p class="wtext">Taxa de Cumprimento</p></th>
         </tr>
         <tr>
-            <td contenteditable="true" id="total" p class="wtext1"></td>
-            <td contenteditable="true" id="cumprido" p class="wtext1"></td>
-            <td id="taxa" p class="wtext1"></td>
+            <td contenteditable="true" id="total" class="wtext1"></td>
+            <td contenteditable="true" id="cumprido" class="wtext1"></td>
+            <td id="taxa" class="wtext1"></td>
+        </tr>
+        <!-- Nova linha para a diferença -->
+        <tr>
+            <td colspan="2"><p class="wtext">Diferença</p></td>
+            <td id="diferenca" class="wtext1"></td>
         </tr>
     </table>
     <script>
         const totalCell = document.getElementById('total');
         const cumpridoCell = document.getElementById('cumprido');
         const taxaCell = document.getElementById('taxa');
+        const diferencaCell = document.getElementById('diferenca');
 
         function calcularTaxa() {
             const total = parseFloat(totalCell.innerText);
@@ -38,8 +44,13 @@
             if (!isNaN(total) && !isNaN(cumprido)) {
                 const taxa = (cumprido / total) * 100;
                 taxaCell.innerText = `${taxa.toFixed(2)}%`;
+
+                // Calcula a diferença
+                const diferenca = total - cumprido;
+                diferencaCell.innerText = diferenca.toFixed(2);
             } else {
                 taxaCell.innerText = 'Insira números válidos';
+                diferencaCell.innerText = '';
             }
         }
 
