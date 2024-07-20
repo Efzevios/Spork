@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de leitura</title>
+</head>
+<style>
+    .wtexte0 {
+        color:bisque
+    }
+    .wtext {
+        color: antiquewhite
+    }
+    .wtext1 {
+        color: blanchedalmond
+    }
+</style>
+<body align="center" bgcolor="#Ecdbb6">
+    <h1>Calculadora de leitura</h1>
+    <form id="pageCalculator">
+        <label for="totalPages">Total de Páginas:</label>
+        <input type="number" id="totalPages" name="totalPages" required>
+        <br>
+        <label for="pagesRead">Páginas Lidas:</label>
+        <input type="number" id="pagesRead" name="pagesRead" required>
+        <br>
+        <button type="button" onclick="calculateRemainingPages()">Calcular</button>
+    </form>
+    <p id="remainingPages"></p>
+
+    <script>
+        function calculateRemainingPages() {
+            const totalPages = parseInt(document.getElementById("totalPages").value);
+            const pagesRead = parseInt(document.getElementById("pagesRead").value);
+            const remainingPages = totalPages - pagesRead;
+            document.getElementById("remainingPages").textContent = `Páginas Restantes: ${remainingPages}`;
+        }
+    </script>
+</body>
+</html>
