@@ -5,17 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taxa de Cumprimento</title>
 </head>
-<body>
-    <table align="center" border="1">
-        <tr>
-            <th>Total</th>
-            <th>Cumprido</th>
-            <th>Taxa de Cumprimento</th>
+<style>
+.wtext {
+    color:antiquewhite
+}
+.wtext1 {
+    color:blanchedalmond
+}
+</style>
+<body>    
+    <table width="700" height="200" cellspacing="2" cellpadding="0" border="1" align="center" bgcolor="#242728">
+        <tr> 
+            <th><p class="wtext">Total</p></th> 
+            <th><p class="wtext">Cumprido</p></th>
+            <th><p class="wtext">Taxa de Cumprimento</p></th>
         </tr>
         <tr>
-            <td contenteditable="true" id="total"></td>
-            <td contenteditable="true" id="cumprido"></td>
-            <td id="taxa"></td>
+            <td contenteditable="true" id="total" p class="wtext1"></td>
+            <td contenteditable="true" id="cumprido" p class="wtext1"></td>
+            <td id="taxa" p class="wtext1"></td>
         </tr>
     </table>
     <script>
