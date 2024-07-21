@@ -3,31 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de leitura</title>
+    <title>Calculadora de Leitura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #444;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 33px;
+        }
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #remainingPages {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #555;
+        }
+    </style>
 </head>
-<style>
-    .wtexte0 {
-        color:bisque
-    }
-    .wtext {
-        color: antiquewhite
-    }
-    .wtext1 {
-        color: blanchedalmond
-    }
-</style>
-<body align="center" bgcolor="#Ecdbb6">
-    <h1>Calculadora de leitura</h1>
-    <form id="pageCalculator">
-        <label for="totalPages">Total de Páginas:</label>
-        <input type="number" id="totalPages" name="totalPages" required>
-        <br>
-        <label for="pagesRead">Páginas Lidas:</label>
-        <input type="number" id="pagesRead" name="pagesRead" required>
-        <br>
-        <button type="button" onclick="calculateRemainingPages()">Calcular</button>
-    </form>
-    <p id="remainingPages"></p>
+<body>
+    <div class="container">
+        <h1>Calculadora de Leitura</h1>
+        <form id="pageCalculator">
+            <label for="totalPages">Total de Páginas:</label>
+            <input type="number" id="totalPages" name="totalPages" required>
+            <label for="pagesRead">Páginas Lidas:</label>
+            <input type="number" id="pagesRead" name="pagesRead" required>
+            <button type="button" onclick="calculateRemainingPages()">Calcular</button>
+        </form>
+        <p id="remainingPages"></p>
+    </div>
 
     <script>
         function calculateRemainingPages() {
