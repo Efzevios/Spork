@@ -4,31 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taxa de Cumprimento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        table {
+            width: 80%;
+            max-width: 700px;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f8f8;
+        }
+        td[contenteditable="true"] {
+            background-color: #f9f9f9;
+            cursor: text;
+        }
+        .highlight {
+            background-color: #e0f7fa;
+        }
+    </style>
 </head>
-<style>
-.wtext {
-    color: antiquewhite;
-}
-.wtext1 {
-    color: blanchedalmond;
-}
-</style>
 <body>    
-    <table width="700" height="200" cellspacing="2" cellpadding="0" border="1" align="center" bgcolor="#242728">
+    <table>
         <tr> 
-            <th><p class="wtext">Total</p></th> 
-            <th><p class="wtext">Cumprido</p></th>
-            <th><p class="wtext">Taxa de Cumprimento</p></th>
+            <th>Total</th> 
+            <th>Cumprido</th>
+            <th>Taxa de Cumprimento</th>
         </tr>
         <tr>
-            <td contenteditable="true" id="total" class="wtext1"></td>
-            <td contenteditable="true" id="cumprido" class="wtext1"></td>
-            <td id="taxa" class="wtext1"></td>
+            <td contenteditable="true" id="total" class="highlight"></td>
+            <td contenteditable="true" id="cumprido" class="highlight"></td>
+            <td id="taxa"></td>
         </tr>
-        <!-- Nova linha para a diferença -->
         <tr>
-            <td colspan="2"><p class="wtext">Diferença</p></td>
-            <td id="diferenca" class="wtext1"></td>
+            <td colspan="2">Diferença</td>
+            <td id="diferenca"></td>
         </tr>
     </table>
     <script>
@@ -45,7 +70,6 @@
                 const taxa = (cumprido / total) * 100;
                 taxaCell.innerText = `${taxa.toFixed(2)}%`;
 
-                // Calcula a diferença
                 const diferenca = total - cumprido;
                 diferencaCell.innerText = diferenca.toFixed(2);
             } else {
