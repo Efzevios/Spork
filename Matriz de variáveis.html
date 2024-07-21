@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz de Variáveis</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            max-width: 600px;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f8f8;
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #007BFF;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #resultado {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Matriz de Variáveis</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Variável</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="highlight">Complexidade</td>
+                <td>
+                    <select id="complexidade">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="highlight">Quantidade de Material</td>
+                <td>
+                    <select id="quantidade_material">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Conhecimento Sobre</td>
+                <td>
+                    <select id="conhecimento_sobre">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Situação de Agenda</td>
+                <td>
+                    <select id="situacao_agenda">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="highlight">Quantidade de Informação</td>
+                <td>
+                    <select id="quantidade_informacao">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                    </select>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button onclick="calcularDias()">Calcular Dias</button>
+    <p id="resultado"></p>
+
+    <script>
+        function calcularDias() {
+            const complexidade = parseInt(document.getElementById('complexidade').value);
+            const quantidade_material = parseInt(document.getElementById('quantidade_material').value);
+            const conhecimento_sobre = parseInt(document.getElementById('conhecimento_sobre').value);
+            const situacao_agenda = parseInt(document.getElementById('situacao_agenda').value);
+            const quantidade_informacao = parseInt(document.getElementById('quantidade_informacao').value);
+
+            let resultado = (complexidade + quantidade_material + quantidade_informacao) * 2;
+            resultado -= (conhecimento_sobre * 0.25 * resultado);
+            resultado -= (situacao_agenda * 0.25 * resultado);
+
+            resultado = Math.max(0, Math.min(7, resultado)); // Limita o resultado entre 0 e 7 dias
+
+            document.getElementById('resultado').innerText = `Resultado: ${resultado.toFixed(2)} dias`;
+        }
+    </script>
+</body>
+</html>
