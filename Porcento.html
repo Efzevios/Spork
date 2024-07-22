@@ -7,8 +7,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            background-color: #121212;
+            color: #e0e0e0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -19,23 +19,35 @@
             width: 80%;
             max-width: 700px;
             border-collapse: collapse;
-            background-color: #fff;
+            background-color: #1e1e1e;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         th, td {
             padding: 15px;
             text-align: center;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #333;
         }
         th {
-            background-color: #f8f8f8;
+            background-color: #333;
         }
         td[contenteditable="true"] {
-            background-color: #f9f9f9;
+            background-color: #2e2e2e;
             cursor: text;
         }
         .highlight {
-            background-color: #e0f7fa;
+            background-color: #2e2e2e;
+        }
+        input[type="date"] {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 5px;
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
         }
     </style>
 </head>
@@ -52,8 +64,24 @@
             <td id="taxa"></td>
         </tr>
         <tr>
-            <td colspan="2">Diferença</td>
+            <td colspan="2"><strong>Diferença</strong></td>
             <td id="diferenca"></td>
+        </tr>
+        <tr>
+            <td><strong>Data Final</strong></td>
+            <td colspan="2"><input type="date" id="data-final" class="highlight"></td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Faltam</strong></td>
+            <td id="faltam"></td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Horas por Tarefa</strong></td>
+            <td id="horas-por-tarefa"></td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Semanas Restantes</strong></td>
+            <td id="semanas-restantes"></td>
         </tr>
     </table>
     <script>
@@ -61,6 +89,10 @@
         const cumpridoCell = document.getElementById('cumprido');
         const taxaCell = document.getElementById('taxa');
         const diferencaCell = document.getElementById('diferenca');
+        const dataFinalInput = document.getElementById('data-final');
+        const faltamCell = document.getElementById('faltam');
+        const horasPorTarefaCell = document.getElementById('horas-por-tarefa');
+        const semanasRestantesCell = document.getElementById('semanas-restantes');
 
         function calcularTaxa() {
             const total = parseFloat(totalCell.innerText);
@@ -78,8 +110,67 @@
             }
         }
 
-        totalCell.addEventListener('input', calcularTaxa);
-        cumpridoCell.addEventListener('input', calcularTaxa);
+        function calcularFaltam() {
+            const dataFinal = new Date(dataFinalInput.value);
+            const agora = new Date();
+            const diferencaHoras = (dataFinal - agora) / (1000 * 60 * 60);
+            const diferencaDias = diferencaHoras / 24;
+
+            if (!isNaN(diferencaHoras) && diferencaHoras > 0) {
+                faltamCell.innerHTML = `faltam ${diferencaHoras.toFixed(0)} horas (${diferencaDias.toFixed(0)} dias)`;
+                faltamCell.className = 'c';
+            } else {
+                faltamCell.innerHTML = 'Data inválida';
+                faltamCell.className = '';
+            }
+        }
+
+        function calcularHorasPorTarefa() {
+            const total = parseFloat(totalCell.innerText);
+            const cumprido = parseFloat(cumpridoCell.innerText);
+            const tarefasRestantes = total - cumprido;
+            const dataFinal = new Date(dataFinalInput.value);
+            const agora = new Date();
+            const diferencaHoras = (dataFinal - agora) / (1000 * 60 * 60);
+
+            if (!isNaN(diferencaHoras) && diferencaHoras > 0 && !isNaN(tarefasRestantes) && tarefasRestantes > 0) {
+                const horasPorTarefa = diferencaHoras / tarefasRestantes;
+                horasPorTarefaCell.innerHTML = `${horasPorTarefa.toFixed(2)} h`;
+                horasPorTarefaCell.className = 'c';
+            } else {
+                horasPorTarefaCell.innerHTML = 'Dados inválidos';
+                horasPorTarefaCell.className = '';
+            }
+        }
+
+        function calcularSemanasRestantes() {
+            const dataFinal = new Date(dataFinalInput.value);
+            const agora = new Date();
+            const diferencaDias = (dataFinal - agora) / (1000 * 60 * 60 * 24);
+            const diferencaSemanas = diferencaDias / 7;
+
+            if (!isNaN(diferencaSemanas) && diferencaSemanas > 0) {
+                semanasRestantesCell.innerHTML = `${diferencaSemanas.toFixed(0)} Semanas`;
+                semanasRestantesCell.className = 'c';
+            } else {
+                semanasRestantesCell.innerHTML = 'Data inválida';
+                semanasRestantesCell.className = '';
+            }
+        }
+
+        totalCell.addEventListener('input', () => {
+            calcularTaxa();
+            calcularHorasPorTarefa();
+        });
+        cumpridoCell.addEventListener('input', () => {
+            calcularTaxa();
+            calcularHorasPorTarefa();
+        });
+        dataFinalInput.addEventListener('input', () => {
+            calcularFaltam();
+            calcularHorasPorTarefa();
+            calcularSemanasRestantes();
+        });
     </script>
 </body>
 </html>
