@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Leitura</title>
+    <title>Matriz de leitura</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            background-color: #333;
+            color: #ccc;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,7 +16,7 @@
             margin: 0;
         }
         .container {
-            background-color: #fff;
+            background-color: #444;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -25,56 +25,83 @@
         h1 {
             margin-bottom: 20px;
             font-size: 24px;
-            color: #444;
+            color: #fff;
         }
         label {
             display: block;
             margin: 10px 0 5px;
+            font-family: Arial, sans-serif;
+            color: #ccc;
         }
         input {
             width: 100%;
             padding: 5px;
             margin-bottom: 20px;
             border: 1px solid #ccc;
-            border-radius: 33px;
+            border-radius: 8px;
+            background-color: #555;
+            color: #fff;
         }
         button {
             background-color: #007BFF;
             color: #fff;
             border: none;
             padding: 10px 20px;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
         }
         button:hover {
             background-color: #0056b3;
         }
-        #remainingPages {
+        hr {
+            margin: 20px 0;
+            border: 0;
+            border-top: 1px solid #666;
+        }
+        #remainingPages, #pagesPerDay, #daysRemaining, #progressPercentage {
             margin-top: 20px;
             font-size: 18px;
-            color: #555;
+            color: #ccc;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Calculadora de Leitura</h1>
+        <h1>Matriz de leitura</h1>
         <form id="pageCalculator">
             <label for="totalPages">Total de Páginas:</label>
             <input type="number" id="totalPages" name="totalPages" required>
             <label for="pagesRead">Páginas Lidas:</label>
             <input type="number" id="pagesRead" name="pagesRead" required>
+            <label for="endDate">Data de Término (DD/MM/YYYY):</label>
+            <input type="date" id="endDate" name="endDate" required>
             <button type="button" onclick="calculateRemainingPages()">Calcular</button>
         </form>
+        <hr>
         <p id="remainingPages"></p>
+        <p id="pagesPerDay"></p>
+        <p id="daysRemaining"></p>
+        <p id="progressPercentage"></p>
     </div>
 
     <script>
         function calculateRemainingPages() {
             const totalPages = parseInt(document.getElementById("totalPages").value);
             const pagesRead = parseInt(document.getElementById("pagesRead").value);
+            const endDate = new Date(document.getElementById("endDate").value);
+            const today = new Date();
+
             const remainingPages = totalPages - pagesRead;
+            const timeDifference = endDate.getTime() - today.getTime();
+            const daysRemaining = Math.ceil(timeDifference / (1000 * 3600 * 24));
+
+            const pagesPerDay = Math.round(remainingPages / daysRemaining);
+            const progressPercentage = Math.max(0, Math.min(100, Math.round((pagesRead / totalPages) * 100)));
+
             document.getElementById("remainingPages").textContent = `Páginas Restantes: ${remainingPages}`;
+            document.getElementById("pagesPerDay").innerHTML = `Páginas por Dia: <b style="color: red;">${pagesPerDay}</b>`;
+            document.getElementById("daysRemaining").textContent = `Dias Restantes: ${daysRemaining} dias`;
+            document.getElementById("progressPercentage").textContent = `Progresso: ${progressPercentage} %`;
         }
     </script>
 </body>
