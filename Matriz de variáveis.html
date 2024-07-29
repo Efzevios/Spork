@@ -155,9 +155,6 @@
             let resultado = (complexidade + quantidade_material + quantidade_informacao) * 2;
             resultado -= (conhecimento_sobre * 0.25 * resultado);
             resultado -= (situacao_agenda * 0.25 * resultado);
-
-            resultado = Math.max(0, Math.min(7, resultado)); // Limita o resultado entre 0 e 7 dias
-
             document.getElementById('resultado').innerText = `Resultado: ${resultado.toFixed(2)} dias`;
         }
     </script>
