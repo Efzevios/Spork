@@ -20,7 +20,9 @@
             max-width: 700px;
             border-collapse: collapse;
             background-color: #1e1e1e;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
         }
         th, td {
             padding: 15px;
@@ -29,10 +31,15 @@
         }
         th {
             background-color: #333;
+            font-weight: bold;
         }
         td[contenteditable="true"] {
             background-color: #2e2e2e;
             cursor: text;
+            border-radius: 6px;
+        }
+        tr:last-child td {
+            border-bottom: none;
         }
         .highlight {
             background-color: #2e2e2e;
@@ -40,9 +47,9 @@
         input[type="date"] {
             background-color: #333;
             color: #fff;
-            border: 1px solid #555;
-            padding: 5px;
-            border-radius: 5px;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
             outline: none;
             cursor: pointer;
         }
