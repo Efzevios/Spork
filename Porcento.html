@@ -20,9 +20,9 @@
             max-width: 700px;
             border-collapse: collapse;
             background-color: #1e1e1e;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px; /* Adiciona arredondamento nos cantos */
+            overflow: hidden; /* Garante que o conteúdo respeite o arredondamento */
         }
         th, td {
             padding: 15px;
@@ -31,15 +31,10 @@
         }
         th {
             background-color: #333;
-            font-weight: bold;
         }
         td[contenteditable="true"] {
             background-color: #2e2e2e;
             cursor: text;
-            border-radius: 6px;
-        }
-        tr:last-child td {
-            border-bottom: none;
         }
         .highlight {
             background-color: #2e2e2e;
@@ -47,9 +42,9 @@
         input[type="date"] {
             background-color: #333;
             color: #fff;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
+            border: 1px solid #555;
+            padding: 5px;
+            border-radius: 5px;
             outline: none;
             cursor: pointer;
         }
@@ -86,10 +81,6 @@
             <td colspan="2"><strong>Horas por Tarefa</strong></td>
             <td id="horas-por-tarefa"></td>
         </tr>
-        <tr>
-            <td colspan="2"><strong>Semanas Restantes</strong></td>
-            <td id="semanas-restantes"></td>
-        </tr>
     </table>
     <script>
         const totalCell = document.getElementById('total');
@@ -99,7 +90,6 @@
         const dataFinalInput = document.getElementById('data-final');
         const faltamCell = document.getElementById('faltam');
         const horasPorTarefaCell = document.getElementById('horas-por-tarefa');
-        const semanasRestantesCell = document.getElementById('semanas-restantes');
 
         function calcularTaxa() {
             const total = parseFloat(totalCell.innerText);
@@ -150,21 +140,6 @@
             }
         }
 
-        function calcularSemanasRestantes() {
-            const dataFinal = new Date(dataFinalInput.value);
-            const agora = new Date();
-            const diferencaDias = (dataFinal - agora) / (1000 * 60 * 60 * 24);
-            const diferencaSemanas = diferencaDias / 7;
-
-            if (!isNaN(diferencaSemanas) && diferencaSemanas > 0) {
-                semanasRestantesCell.innerHTML = `${diferencaSemanas.toFixed(0)} Semanas`;
-                semanasRestantesCell.className = 'c';
-            } else {
-                semanasRestantesCell.innerHTML = 'Data inválida';
-                semanasRestantesCell.className = '';
-            }
-        }
-
         totalCell.addEventListener('input', () => {
             calcularTaxa();
             calcularHorasPorTarefa();
@@ -176,7 +151,6 @@
         dataFinalInput.addEventListener('input', () => {
             calcularFaltam();
             calcularHorasPorTarefa();
-            calcularSemanasRestantes();
         });
     </script>
 </body>
