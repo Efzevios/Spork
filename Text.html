@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabela de Tópicos</title>
+    <title>Página da Disciplina</title>
     <style>
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #121212; /* Dark mode */
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
             color: #e0e0e0;
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
         }
         table {
             width: 100%;
@@ -22,7 +26,7 @@
             background-color: #1e1e1e;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
             border-radius: 8px;
-            margin-top: 20px;
+            overflow: hidden;
         }
         th, td {
             padding: 12px;
@@ -33,7 +37,7 @@
             background-color: #333;
             font-weight: 600;
         }
-        .row:hover {
+        tr:hover {
             background-color: #2c2c2c;
         }
         button {
@@ -46,138 +50,123 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        #addRow, #saveToMarkdown {
-            display: block;
-            margin-top: 10px;
+        #mdOutput {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            white-space: pre-wrap;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
         }
     </style>
 </head>
 <body>
-    <h1 id="titulo">Nome da Disciplina</h1>
-    
-    <table>
+    <h1 id="disciplinaTitle">Nome da Disciplina</h1>
+    <table id="topicoTable">
         <thead>
             <tr>
                 <th>Enumeração</th>
                 <th>Nome do Tópico</th>
-                <th>Tempo Estimado (dias)</th>
+                <th>Tempo Estimado</th>
             </tr>
         </thead>
-        <tbody id="tableBody">
-            <!-- Linhas da tabela vão aqui -->
+        <tbody>
+            <!-- Linhas serão geradas aqui -->
         </tbody>
     </table>
-
-    <button id="addRow">+</button>
-    <button id="saveToMarkdown">Salvar</button>
+    <button onclick="adicionarLinha()">+</button>
+    <button onclick="gerarMarkdown()">Salvar</button>
+    <pre id="mdOutput"></pre>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            let disciplina = prompt("Nome da disciplina:");
-            document.getElementById("titulo").innerText = disciplina || "Nome da Disciplina";
+        let contadorEnum = 10;
 
-            let rowCount = 10;
+        // Exibe o prompt de Nome da Disciplina
+        document.addEventListener('DOMContentLoaded', () => {
+            const nomeDisciplina = prompt('Nome da disciplina:');
+            document.getElementById('disciplinaTitle').innerText = nomeDisciplina || 'Disciplina';
+        });
 
-            function createRow(num) {
-                const row = document.createElement("tr");
-                row.classList.add("row");
+        // Função para adicionar linha
+        function adicionarLinha() {
+            const tabela = document.getElementById('topicoTable').getElementsByTagName('tbody')[0];
+            const novaLinha = tabela.insertRow();
+            const celulaEnum = novaLinha.insertCell(0);
+            const celulaNome = novaLinha.insertCell(1);
+            const celulaTempo = novaLinha.insertCell(2);
 
-                const cellEnum = document.createElement("td");
-                cellEnum.textContent = num;
+            celulaEnum.textContent = ++contadorEnum;
+            celulaNome.innerHTML = `<span onclick="abrirPopUp('${contadorEnum}')">Clique para editar</span>`;
+            celulaTempo.textContent = ''; // Placeholder para o tempo estimado
+        }
 
-                const cellTopic = document.createElement("td");
-                cellTopic.textContent = "Clique para editar";
-                cellTopic.addEventListener("click", () => openTopicModal(num, cellTopic));
-
-                const cellEstimate = document.createElement("td");
-                cellEstimate.textContent = ""; // Tempo estimado inicialmente vazio
-
-                row.appendChild(cellEnum);
-                row.appendChild(cellTopic);
-                row.appendChild(cellEstimate);
-                document.getElementById("tableBody").appendChild(row);
-            }
-
-            for (let i = 1; i <= rowCount; i++) {
-                createRow(i);
-            }
-
-            document.getElementById("addRow").addEventListener("click", function() {
-                rowCount++;
-                createRow(rowCount);
-            });
-
-            document.getElementById("saveToMarkdown").addEventListener("click", function() {
-                saveToMarkdown(disciplina);
-            });
-
-            function openTopicModal(num, cell) {
-                const action = confirm("Escolha uma ação:\nOK para editar nome do tópico\nCancelar para abrir a Matriz de Variáveis");
-                if (action) {
-                    const newName = prompt("Editar nome do tópico:");
-                    if (newName) cell.textContent = newName;
-                } else {
-                    openMatrixModal(num, cell.nextElementSibling);
+        // Pop-up para edição do Nome do Tópico e acesso à Matriz de Variáveis
+        function abrirPopUp(enumValue) {
+            const escolha = confirm('Deseja editar o Nome do Tópico ou abrir a Matriz de Variáveis? OK para editar, Cancelar para abrir Matriz.');
+            if (escolha) {
+                const novoNome = prompt('Novo nome do tópico:');
+                if (novoNome) {
+                    document.querySelector(`#topicoTable tbody tr:nth-child(${enumValue}) td:nth-child(2)`).textContent = novoNome;
                 }
+            } else {
+                abrirMatrizVariaveis(enumValue);
             }
+        }
 
-            function openMatrixModal(num, cellEstimate) {
-                const modalContent = `<!DOCTYPE html>
+        // Abrir Matriz de Variáveis
+        function abrirMatrizVariaveis(enumValue) {
+            const novaJanela = window.open('', '_blank');
+            novaJanela.document.write(`
+                <!DOCTYPE html>
                 <html lang="pt-BR">
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>Matriz de Variáveis</title>
-                    <style>
-                        body { background-color: #121212; color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-                        table, th, td { background-color: #1e1e1e; border-collapse: collapse; border: 1px solid #333; padding: 8px; color: #e0e0e0; }
-                        select, button { background-color: #6200ea; color: #e0e0e0; padding: 8px; margin-top: 10px; }
-                    </style>
+                    <style> /* Mesma estilização da matriz de variáveis fornecida */ </style>
                 </head>
                 <body>
                     <h1>Matriz de Variáveis</h1>
                     <table>
-                        <tr><td>Complexidade</td><td><select id="complexidade"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></td></tr>
-                        <tr><td>Quantidade de Material</td><td><select id="quantidade_material"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></td></tr>
-                        <tr><td>Conhecimento Sobre</td><td><select id="conhecimento_sobre"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></td></tr>
-                        <tr><td>Situação de Agenda</td><td><select id="situacao_agenda"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></td></tr>
-                        <tr><td>Quantidade de Informação</td><td><select id="quantidade_informacao"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></td></tr>
+                        <thead><tr><th>Variável</th><th>Valor</th></tr></thead>
+                        <tbody>
+                            <!-- Tabela de variáveis com inputs de seleção -->
+                        </tbody>
                     </table>
-                    <button onclick="window.opener.calculateEstimate()">Calcular Dias</button>
+                    <button onclick="calcularDias()">Calcular Dias</button>
+                    <p id="resultado"></p>
+                    <button onclick="window.opener.atualizarTempoEstimado(${enumValue}, resultado.innerText); window.close();">Salvar</button>
                 </body>
-                </html>`;
+                <script>
+                    function calcularDias() {
+                        const resultado = "Exemplo de cálculo";
+                        document.getElementById('resultado').textContent = resultado;
+                    }
+                </script>
+                </html>
+            `);
+        }
 
-                const matrixWindow = window.open("", "_blank", "width=400,height=400");
-                matrixWindow.document.write(modalContent);
-                matrixWindow.document.close();
-            }
+        // Atualizar coluna "Tempo Estimado" na tabela principal
+        function atualizarTempoEstimado(enumValue, tempoEstimado) {
+            const linha = document.querySelector(`#topicoTable tbody tr:nth-child(${enumValue})`);
+            linha.cells[2].textContent = tempoEstimado;
+        }
 
-            window.calculateEstimate = function() {
-                const complexidade = parseInt(window.document.getElementById("complexidade").value);
-                const quantidade_material = parseInt(window.document.getElementById("quantidade_material").value);
-                const conhecimento_sobre = parseInt(window.document.getElementById("conhecimento_sobre").value);
-                const situacao_agenda = parseInt(window.document.getElementById("situacao_agenda").value);
-                const quantidade_informacao = parseInt(window.document.getElementById("quantidade_informacao").value);
-
-                let estimate = (complexidade + quantidade_material + quantidade_informacao) * 2;
-                estimate -= (conhecimento_sobre * 0.25 * estimate);
-                estimate -= (situacao_agenda * 0.25 * estimate);
-
-                const currentRow = window.opener.document.getElementById("tableBody").rows[num - 1];
-                currentRow.cells[2].innerText = `${estimate.toFixed(2)} dias`;
-                matrixWindow.close();
-            };
-
-            function saveToMarkdown(disciplina) {
-                let markdown = `# ${disciplina}\n\n| Enumeração | Nome do Tópico | Tempo Estimado (dias) |\n|------------|----------------|------------------------|\n`;
-                document.querySelectorAll("#tableBody tr").forEach((row, index) => {
-                    const cells = row.querySelectorAll("td");
-                    markdown += `| ${cells[0].innerText} | ${cells[1].innerText} | ${cells[2].innerText || "N/A"} |\n`;
-                });
-                console.log(markdown); // Aqui você pode salvar ou exibir o markdown conforme desejado
-            }
-        });
+        // Geração de Markdown
+        function gerarMarkdown() {
+            let markdown = `# ${document.getElementById('disciplinaTitle').innerText}\n\n| Enumeração | Nome do Tópico | Tempo Estimado |\n|------------|----------------|----------------|\n`;
+            const linhas = document.querySelectorAll('#topicoTable tbody tr');
+            linhas.forEach(linha => {
+                const enumValue = linha.cells[0].textContent;
+                const nomeTopico = linha.cells[1].textContent;
+                const tempoEstimado = linha.cells[2].textContent || 'N/A';
+                markdown += `| ${enumValue} | ${nomeTopico} | ${tempoEstimado} |\n`;
+            });
+            document.getElementById('mdOutput').textContent = markdown;
+        }
     </script>
 </body>
 </html>
-
