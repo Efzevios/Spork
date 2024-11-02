@@ -53,6 +53,27 @@
         button:hover {
             background-color: #3700b3;
         }
+        /* Estilo do modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #121212;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+        }
     </style>
 </head>
 <body>
@@ -74,14 +95,13 @@
         </tr>
     </thead>
     <tbody>
-        <!-- Linhas de exemplo iniciais -->
         <script>
             for (let i = 1; i <= 10; i++) {
                 document.write(`
                     <tr>
                         <td>${i}</td>
-                        <td onclick="abrirPopup(${i})">Clique para adicionar</td>
-                        <td id="tempo${i}">-</td>
+                        <td ondblclick="editarNome(${i})">Clique para adicionar</td>
+                        <td ondblclick="abrirMatriz(${i})" id="tempo${i}">-</td>
                     </tr>
                 `);
             }
@@ -95,9 +115,59 @@
     <button onclick="gerarMarkdown()">Salvar</button>
 </div>
 
-<!-- Script para adicionar funcionalidade -->
+<!-- Modal para edição de nome -->
+<div id="modalNome" class="modal">
+    <div class="modal-content">
+        <h2>Editar Nome do Tópico</h2>
+        <input type="text" id="novoNome" placeholder="Digite o nome do tópico">
+        <button onclick="salvarNome()">Salvar</button>
+        <button onclick="fecharModal('modalNome')">Cancelar</button>
+    </div>
+</div>
+
+<!-- Modal para Matriz de Variáveis -->
+<div id="modalMatriz" class="modal">
+    <div class="modal-content">
+        <h1>Matriz de Variáveis</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Variável</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="highlight" title="Complexidade">Complexidade</td>
+                    <td><select id="complexidade"><option>0</option><option>1</option><option>2</option></select></td>
+                </tr>
+                <tr>
+                    <td class="highlight" title="Quantidade de Material">Quantidade de Material</td>
+                    <td><select id="material"><option>0</option><option>1</option><option>2</option></select></td>
+                </tr>
+                <tr>
+                    <td title="Conhecimento Sobre">Conhecimento Sobre</td>
+                    <td><select id="conhecimento"><option>0</option><option>1</option><option>2</option></select></td>
+                </tr>
+                <tr>
+                    <td title="Situação de Agenda">Situação de Agenda</td>
+                    <td><select id="agenda"><option>0</option><option>1</option><option>2</option></select></td>
+                </tr>
+                <tr>
+                    <td class="highlight" title="Quantidade de Informação">Quantidade de Informação</td>
+                    <td><select id="informacao"><option>0</option><option>1</option><option>2</option></select></td>
+                </tr>
+            </tbody>
+        </table>
+        <button onclick="calcularDias()">Calcular Dias</button>
+        <p id="resultado"></p>
+        <button onclick="fecharModal('modalMatriz')">Fechar</button>
+    </div>
+</div>
+
 <script>
     let contador = 10;
+    let indiceEdicao = null;  // Para controlar qual linha está sendo editada
 
     // Função para adicionar uma nova linha
     function adicionarLinha() {
@@ -106,85 +176,51 @@
         const novaLinha = tabela.insertRow();
         novaLinha.innerHTML = `
             <td>${contador}</td>
-            <td onclick="abrirPopup(${contador})">Clique para adicionar</td>
-            <td id="tempo${contador}">-</td>
+            <td ondblclick="editarNome(${contador})">Clique para adicionar</td>
+            <td ondblclick="abrirMatriz(${contador})" id="tempo${contador}">-</td>
         `;
     }
 
-    // Função para abrir pop-up de edição de tópico
-    function abrirPopup(indice) {
-        const popup = window.open("", "popup", "width=400,height=400");
-        popup.document.write(`
-            <!DOCTYPE html>
-            <html lang="pt-BR">
-            <head>
-                <title>Edição do Tópico</title>
-                <style>
-                    body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #121212; color: #e0e0e0; text-align: center; padding: 20px; }
-                    button { padding: 10px 20px; font-size: 16px; color: #e0e0e0; background-color: #6200ea; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px; }
-                    button:hover { background-color: #3700b3; }
-                </style>
-            </head>
-            <body>
-                <h2>Edição do Tópico ${indice}</h2>
-                <button onclick="window.opener.editarNome(${indice})">Editar Nome</button>
-                <button onclick="window.opener.abrirMatriz(${indice}); window.close();">Matriz de Variáveis</button>
-            </body>
-            </html>
-        `);
-    }
-
-    // Função para editar o nome do tópico
+    // Função para abrir modal de edição de nome
     function editarNome(indice) {
-        const novoNome = prompt("Digite o novo nome do tópico:");
-        if (novoNome) {
-            document.getElementById("tabela-topicos").rows[indice].cells[1].innerText = novoNome;
-        }
+        indiceEdicao = indice;
+        document.getElementById("modalNome").style.display = "flex";
     }
 
-    // Função para abrir matriz de variáveis
+    // Função para salvar o novo nome
+    function salvarNome() {
+        const novoNome = document.getElementById("novoNome").value;
+        if (novoNome) {
+            document.getElementById("tabela-topicos").rows[indiceEdicao].cells[1].innerText = novoNome;
+        }
+        fecharModal('modalNome');
+    }
+
+    // Função para abrir modal da Matriz de Variáveis
     function abrirMatriz(indice) {
-        const popup = window.open("", "matriz", "width=600,height=600");
-        popup.document.write(`
-            <!DOCTYPE html>
-            <html lang="pt-BR">
-            <head>
-                <title>Matriz de Variáveis</title>
-                <style>
-                    body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #121212; color: #e0e0e0; text-align: center; padding: 20px; }
-                    button { padding: 10px 20px; font-size: 16px; color: #e0e0e0; background-color: #6200ea; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px; }
-                    button:hover { background-color: #3700b3; }
-                    table { margin-top: 20px; width: 100%; max-width: 400px; border-collapse: collapse; }
-                    th, td { padding: 10px; border: 1px solid #333; }
-                    th { background-color: #333; }
-                </style>
-            </head>
-            <body>
-                <h2>Matriz de Variáveis</h2>
-                <table>
-                    <thead>
-                        <tr><th>Variável</th><th>Valor</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Complexidade</td><td><select id="complexidade"><option>0</option><option>1</option><option>2</option></select></td></tr>
-                        <tr><td>Quantidade de Material</td><td><select id="material"><option>0</option><option>1</option><option>2</option></select></td></tr>
-                        <tr><td>Conhecimento</td><td><select id="conhecimento"><option>0</option><option>1</option><option>2</option></select></td></tr>
-                        <tr><td>Agenda</td><td><select id="agenda"><option>0</option><option>1</option><option>2</option></select></td></tr>
-                        <tr><td>Informação</td><td><select id="informacao"><option>0</option><option>1</option><option>2</option></select></td></tr>
-                    </tbody>
-                </table>
-                <button onclick="window.opener.calcularTempo(${indice}, document.getElementById('complexidade').value, document.getElementById('material').value, document.getElementById('conhecimento').value, document.getElementById('agenda').value, document.getElementById('informacao').value); window.close();">Calcular Dias</button>
-            </body>
-            </html>
-        `);
+        indiceEdicao = indice;
+        document.getElementById("modalMatriz").style.display = "flex";
+    }
+
+    // Função para fechar modal
+    function fecharModal(modalId) {
+        document.getElementById(modalId).style.display = "none";
     }
 
     // Função para calcular o tempo estimado e atualizar na tabela
-    function calcularTempo(indice, complexidade, material, conhecimento, agenda, informacao) {
-        let resultado = (parseInt(complexidade) + parseInt(material) + parseInt(informacao)) * 2;
-        resultado -= (parseInt(conhecimento) * 0.25 * resultado);
-        resultado -= (parseInt(agenda) * 0.25 * resultado);
-        document.getElementById(`tempo${indice}`).innerText = `${resultado.toFixed(2)} dias`;
+    function calcularDias() {
+        const complexidade = parseInt(document.getElementById('complexidade').value);
+        const material = parseInt(document.getElementById('material').value);
+        const conhecimento = parseInt(document.getElementById('conhecimento').value);
+        const agenda = parseInt(document.getElementById('agenda').value);
+        const informacao = parseInt(document.getElementById('informacao').value);
+
+        let resultado = (complexidade + material + informacao) * 2;
+        resultado -= (conhecimento * 0.25 * resultado);
+        resultado -= (agenda * 0.25 * resultado);
+
+        document.getElementById(`tempo${indiceEdicao}`).innerText = `${resultado.toFixed(2)} dias`;
+        document.getElementById('resultado').innerText = `Resultado: ${resultado.toFixed(2)} dias`;
     }
 
     // Função para gerar Markdown com os dados da tabela
@@ -195,7 +231,7 @@
             const cols = linha.querySelectorAll("td");
             markdown += `| ${cols[0].innerText} | ${cols[1].innerText} | ${cols[2].innerText} |\n`;
         });
-        console.log(markdown);  // Para depuração, o Markdown será exibido no console
+        console.log(markdown);  // Exibe o Markdown no console
         alert("Markdown gerado. Veja no console.");
     }
 </script>
