@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela de Tópicos</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #121212; /* Dark mode */
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        table {
+            width: 100%;
+            max-width: 600px;
+            border-collapse: collapse;
+            background-color: #1e1e1e;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            background-color: #333;
+            font-weight: 600;
+        }
+        .row:hover {
+            background-color: #2c2c2c;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #e0e0e0;
+            background-color: #6200ea;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #addRow, #saveToMarkdown {
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="titulo">Nome da Disciplina</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Enumeração</th>
+                <th>Nome do Tópico</th>
+                <th>Tempo Estimado (dias)</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Linhas da tabela vão aqui -->
+        </tbody>
+    </table>
+
+    <button id="addRow">+</button>
+    <button id="saveToMarkdown">Salvar</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let disciplina = prompt("Nome da disciplina:");
+            document.getElementById("titulo").innerText = disciplina || "Nome da Disciplina";
+
+            let rowCount = 10;
+
+            function createRow(num) {
+                const row = document.createElement("tr");
+                row.classList.add("row");
+
+                const cellEnum = document.createElement("td");
+                cellEnum.textContent = num;
+
+                const cellTopic = document.createElement("td");
+                cellTopic.textContent = "Clique para editar";
+                cellTopic.addEventListener("click", () => openTopicModal(num, cellTopic));
+
+                const cellEstimate = document.createElement("td");
+                cellEstimate.textContent = ""; // Tempo estimado inicialmente vazio
+
+                row.appendChild(cellEnum);
+                row.appendChild(cellTopic);
+                row.appendChild(cellEstimate);
+                document.getElementById("tableBody").appendChild(row);
+            }
+
+            for (let i = 1; i <= rowCount; i++) {
+                createRow(i);
+            }
+
+            document.getElementById("addRow").addEventListener("click", function() {
+                rowCount++;
+                createRow(rowCount);
+            });
+
+            document.getElementById("saveToMarkdown").addEventListener("click", function() {
+                saveToMarkdown(disciplina);
+            });
+
+            function openTopicModal(num, cell) {
+                const action = confirm("Escolha uma ação:\nOK para editar nome do tópico\nCancelar para abrir a Matriz de Variáveis");
+                if (action) {
+                    const newName = prompt("Editar nome do tópico:");
+                    if (newName) cell.textContent = newName;
+                } else {
+                    openMatrixModal(num, cell.nextElementSibling);
+                }
+            }
+
+            function openMatrixModal(num, cellEstimate) {
+                const modalContent = `<!DOCTYPE html>
+                <html lang="pt-BR">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Matriz de Variáveis</title>
+                    <style>
+                        body { background-color: #121212; color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+                        table, th, td { background-color: #1e1e1e; border-collapse: collapse; border: 1px solid #333; padding: 8px; color: #e0e0e0; }
+                        select, button { background-color: #6200ea; color: #e0e0e0; padding: 8px; margin-top: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Matriz de Variáveis</h1>
+                    <table>
+                        <tr><td>Complexidade</td><td><select id="complexidade"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></td></tr>
+                        <tr><td>Quantidade de Material</td><td><select id="quantidade_material"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></td></tr>
+                        <tr><td>Conhecimento Sobre</td><td><select id="conhecimento_sobre"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></td></tr>
+                        <tr><td>Situação de Agenda</td><td><select id="situacao_agenda"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></td></tr>
+                        <tr><td>Quantidade de Informação</td><td><select id="quantidade_informacao"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></td></tr>
+                    </table>
+                    <button onclick="window.opener.calculateEstimate()">Calcular Dias</button>
+                </body>
+                </html>`;
+
+                const matrixWindow = window.open("", "_blank", "width=400,height=400");
+                matrixWindow.document.write(modalContent);
+                matrixWindow.document.close();
+            }
+
+            window.calculateEstimate = function() {
+                const complexidade = parseInt(window.document.getElementById("complexidade").value);
+                const quantidade_material = parseInt(window.document.getElementById("quantidade_material").value);
+                const conhecimento_sobre = parseInt(window.document.getElementById("conhecimento_sobre").value);
+                const situacao_agenda = parseInt(window.document.getElementById("situacao_agenda").value);
+                const quantidade_informacao = parseInt(window.document.getElementById("quantidade_informacao").value);
+
+                let estimate = (complexidade + quantidade_material + quantidade_informacao) * 2;
+                estimate -= (conhecimento_sobre * 0.25 * estimate);
+                estimate -= (situacao_agenda * 0.25 * estimate);
+
+                const currentRow = window.opener.document.getElementById("tableBody").rows[num - 1];
+                currentRow.cells[2].innerText = `${estimate.toFixed(2)} dias`;
+                matrixWindow.close();
+            };
+
+            function saveToMarkdown(disciplina) {
+                let markdown = `# ${disciplina}\n\n| Enumeração | Nome do Tópico | Tempo Estimado (dias) |\n|------------|----------------|------------------------|\n`;
+                document.querySelectorAll("#tableBody tr").forEach((row, index) => {
+                    const cells = row.querySelectorAll("td");
+                    markdown += `| ${cells[0].innerText} | ${cells[1].innerText} | ${cells[2].innerText || "N/A"} |\n`;
+                });
+                console.log(markdown); // Aqui você pode salvar ou exibir o markdown conforme desejado
+            }
+        });
+    </script>
+</body>
+</html>
+
