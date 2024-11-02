@@ -39,6 +39,9 @@
             background-color: #333;
             font-weight: 600;
         }
+        td:first-child, th:first-child {
+            font-weight: bold; /* Negrito para enumeração */
+        }
         tr:last-child td {
             border-bottom: none;
         }
@@ -49,7 +52,7 @@
             margin-top: 20px;
         }
         button {
-            margin: 5px;
+            margin: 10px; /* Aumentar espaçamento entre botões */
             padding: 10px 20px;
             font-size: 16px;
             color: #e0e0e0;
@@ -62,37 +65,51 @@
         button:hover {
             background-color: #3700b3;
         }
-        /* Estilo do modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background-color: #121212;
+        /* Estilo do formulário inicial */
+        #formDisciplina {
+            background-color: #1e1e1e;
             padding: 20px;
-            border-radius: 8px;
-            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
             width: 90%;
             max-width: 600px;
+            text-align: center;
+        }
+        #formDisciplina input {
+            padding: 10px;
+            width: 80%;
+            border-radius: 5px;
+            border: none;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        #formDisciplina button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #6200ea;
+            border: none;
+            color: #e0e0e0;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        #formDisciplina button:hover {
+            background-color: #3700b3;
         }
     </style>
 </head>
 <body>
 
-<h1>Organizador de Disciplina</h1>
+<!-- Formulário para definir o nome da disciplina -->
+<div id="formDisciplina">
+    <h2>Digite o Nome da Disciplina</h2>
+    <input type="text" id="nomeDisciplina" placeholder="Nome da disciplina">
+    <button onclick="definirDisciplina()">Confirmar</button>
+</div>
 
-<!-- Popup para pedir nome da disciplina -->
-<script>
-    let nomeDisciplina = prompt("Nome da disciplina:");
-</script>
+<h1 id="tituloDisciplina">Organizador de Disciplina</h1>
 
 <!-- Tabela de tópicos -->
 <table id="tabela-topicos">
@@ -108,8 +125,8 @@
             for (let i = 1; i <= 10; i++) {
                 document.write(`
                     <tr>
-                        <td>${i}</td>
-                        <td ondblclick="editarNome(${i})">Clique para adicionar</td>
+                        <td><b>${i}</b></td>
+                        <td ondblclick="editarNome(${i})"><b>Clique para adicionar</b></td>
                         <td ondblclick="abrirMatriz(${i})" id="tempo${i}">-</td>
                     </tr>
                 `);
@@ -170,7 +187,7 @@
         </table>
         <button onclick="calcularDias()">Calcular Dias</button>
         <p id="resultado"></p>
-        <button onclick="fecharModal('modalMatriz')">Fechar</button>
+        <button onclick="fecharModal('modalMatriz')">Salvar</button>
     </div>
 </div>
 
@@ -178,14 +195,21 @@
     let contador = 10;
     let indiceEdicao = null;
 
+    // Função para definir o nome da disciplina e exibir o título atualizado
+    function definirDisciplina() {
+        const nomeDisciplina = document.getElementById("nomeDisciplina").value;
+        document.getElementById("tituloDisciplina").innerText = nomeDisciplina ? nomeDisciplina : "Organizador de Disciplina";
+        document.getElementById("formDisciplina").style.display = "none";
+    }
+
     // Função para adicionar uma nova linha
     function adicionarLinha() {
         contador++;
         const tabela = document.getElementById("tabela-topicos").getElementsByTagName('tbody')[0];
         const novaLinha = tabela.insertRow();
         novaLinha.innerHTML = `
-            <td>${contador}</td>
-            <td ondblclick="editarNome(${contador})">Clique para adicionar</td>
+            <td><b>${contador}</b></td>
+            <td ondblclick="editarNome(${contador})"><b>Clique para adicionar</b></td>
             <td ondblclick="abrirMatriz(${contador})" id="tempo${contador}">-</td>
         `;
     }
@@ -234,6 +258,7 @@
 
     // Função para gerar Markdown com os dados da tabela e copiar automaticamente
     function gerarMarkdown() {
+        const nomeDisciplina = document.getElementById("tituloDisciplina").innerText;
         let markdown = `# ${nomeDisciplina}\n\n| Enumeração | Nome do Tópico | Tempo Estimado |\n|------------|----------------|----------------|\n`;
         const linhas = document.querySelectorAll("#tabela-topicos tbody tr");
         linhas.forEach(linha => {
@@ -241,7 +266,6 @@
             markdown += `| ${cols[0].innerText} | ${cols[1].innerText} | ${cols[2].innerText} |\n`;
         });
 
-        // Copiar markdown automaticamente para a área de transferência
         navigator.clipboard.writeText(markdown).then(() => {
             alert("Markdown copiado para a área de transferência!");
         }).catch(err => {
