@@ -101,6 +101,46 @@
             font-size: 16px;
             text-align: center;
         }
+        .data-container {
+    margin-top: 20px;
+    background-color: #1e1e1e;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+.data-container label {
+    font-size: 16px;
+    margin-bottom: 8px;
+    font-weight: bold;
+        }
+.data-container input {
+    background-color: #333;
+    color: #e0e0e0;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+    text-align: center;
+        }
+.delete-btn {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+        }
+.delete-btn:hover {
+    transform: scale(1.2);
+    color: #ff1a1a;
+        }  
+
     </style>
 </head>
 <body>
@@ -113,6 +153,11 @@
 <h1 id="tituloDisciplina">Organizador de Disciplina</h1>
 
 <!-- Tabela de tópicos -->
+<div class="data-container">
+    <label for="dataFinal">Defina a data final:</label>
+    <input type="date" id="dataFinal" onchange="atualizarDistribuicao()">
+</div>
+
 <table id="tabela-topicos">
     <thead>
         <tr>
@@ -122,16 +167,18 @@
         </tr>
     </thead>
     <tbody>
-        <script>
-            for (let i = 1; i <= 10; i++) {
+        <script>      
+            for (let i = 1; i <= 5; i++) {
                 document.write(`
                     <tr>
                         <td>${i}</td>
                         <td ondblclick="editarNome(${i})">Clique para adicionar</td>
                         <td ondblclick="abrirMatriz(${i})" id="tempo${i}">-</td>
+                        <td><button class="delete-btn" onclick="removerLinha(this)">X</button></td>
                     </tr>
                 `);
             }
+
         </script>
     </tbody>
 </table>
@@ -193,7 +240,7 @@
 </div>
 
 <script>
-    let contador = 10;
+    let contador = 5;
     let indiceEdicao = null;
 
     // Função para atualizar o título da disciplina
@@ -204,15 +251,16 @@
 
     // Função para adicionar uma nova linha
     function adicionarLinha() {
-        contador++;
-        const tabela = document.getElementById("tabela-topicos").getElementsByTagName('tbody')[0];
-        const novaLinha = tabela.insertRow();
-        novaLinha.innerHTML = `
-            <td>${contador}</td>
-            <td ondblclick="editarNome(${contador})">Clique para adicionar</td>
-            <td ondblclick="abrirMatriz(${contador})" id="tempo${contador}">-</td>
-        `;
-    }
+    contador++;
+    const tabela = document.getElementById("tabela-topicos").getElementsByTagName('tbody')[0];
+    const novaLinha = tabela.insertRow();
+    novaLinha.innerHTML = `
+        <td>${contador}</td>
+        <td ondblclick="editarNome(${contador})">Clique para adicionar</td>
+        <td ondblclick="abrirMatriz(${contador})" id="tempo${contador}">-</td>
+        <td><button class="delete-btn" onclick="removerLinha(this)">X</button></td>
+    `;
+}
 
     // Função para abrir modal de edição de nome
     function editarNome(indice) {
@@ -272,6 +320,43 @@
         }).catch(err => {
             console.error("Erro ao copiar markdown: ", err);
         });
+    }
+    // Suas funções existentes...
+
+    // Adicionar variável "limitador"
+    let dataInicial = new Date();
+    let dataFinal = new Date(); // Será definida pelo usuário
+
+    // Função para calcular e redistribuir tempos estimados proporcionalmente
+    function atualizarDistribuicao() {
+        const inputDataFinal = document.getElementById("dataFinal").value;
+        if (!inputDataFinal) return;
+        
+        dataFinal = new Date(inputDataFinal);
+        const diasTotais = Math.ceil((dataFinal - dataInicial) / (1000 * 60 * 60 * 24));
+        if (diasTotais <= 0) return alert("A data final deve ser posterior ao dia de hoje.");
+
+        let linhas = document.querySelectorAll("#tabela-topicos tbody tr");
+        let somaPesos = 0;
+        let temposEstimados = [];
+
+        // Coletar os pesos atuais e calcular a soma total
+        linhas.forEach((linha, index) => {
+            let tempoTexto = linha.cells[2].innerText;
+            let tempo = parseFloat(tempoTexto) || 1; // Se não houver valor, assume 1
+            temposEstimados[index] = tempo;
+            somaPesos += tempo;
+        });
+
+        // Redistribuir os tempos proporcionalmente
+        linhas.forEach((linha, index) => {
+            let novoTempo = (temposEstimados[index] / somaPesos) * diasTotais;
+            linha.cells[2].innerText = `${novoTempo.toFixed(2)} dias`;
+        });
+    }
+    function removerLinha(botao) {
+    const linha = botao.parentNode.parentNode;
+    linha.parentNode.removeChild(linha);
     }
 </script>
 
