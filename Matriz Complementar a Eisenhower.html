@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Planejador de Estudos – Matriz de Eisenhower</title>
+  <title>Planejador de Estudos – Matriz de Eisenhower (Dark Mode)</title>
 
-  <!-- Estilos Inline Atualizados -->
+  <!-- Estilos Inline Dark Mode -->
   <style>
     :root {
-      --bg: #f9f9f9;
-      --card-bg: #ffffff;
-      --text: #333333;
-      --border: #e0e0e0;
+      --bg: #121212;
+      --card-bg: #1e1e1e;
+      --text: #e0e0e0;
+      --border: #333333;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -53,7 +53,7 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.5rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
       width: 90%; max-width: 800px;
       margin: 0 auto;
     }
@@ -71,7 +71,7 @@
       text-align: center;
     }
     thead th {
-      background: var(--bg);
+      background: var(--card-bg);
     }
     th:first-child { border-top-left-radius: 12px; }
     th:last-child  { border-top-right-radius: 12px; }
@@ -83,6 +83,8 @@
       padding: 0.5rem;
       border: 1px solid var(--border);
       border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
       font-family: inherit;
       font-size: 0.95rem;
     }
@@ -104,7 +106,7 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.7);
       justify-content: center;
       align-items: center;
       padding: 1rem;
@@ -135,6 +137,9 @@
     #copyBtn {
       margin-top: 1rem;
       float: right;
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
     }
     @media (max-width: 600px) {
       header, .container { padding: 1rem; }
@@ -145,7 +150,7 @@
     .fc {
       background: var(--card-bg);
       border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
       padding: 1rem;
     }
     .fc-toolbar {
@@ -160,6 +165,7 @@
       margin: 0 0.25rem;
       cursor: pointer;
       transition: background 0.2s;
+      color: var(--text);
     }
     .fc-button:hover { background: var(--border); }
   </style>
@@ -178,7 +184,7 @@
 <body>
 
   <header>
-    <h1>📚 Planejador de Estudos</h1>
+    <h1>Planejador de Estudos</h1>
     <button id="addRowBtn">➕ Nova Disciplina</button>
   </header>
 
@@ -204,13 +210,13 @@
   <div id="contentModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>📝 Conteúdos (Markdown)</h2>
+        <h2>Conteúdos (Markdown)</h2>
         <button class="close" id="closeContent">&times;</button>
       </div>
       <p>Cole sua tabela Markdown (<code>| Enumeração | Nome do Tópico | Tempo Estimado (h) |</code>):</p>
       <textarea id="mdContent" rows="6" placeholder="| 1 | Álgebra | 2 |"></textarea>
       <div style="text-align: right; margin-top: 1rem;">
-        <button id="saveContent">💾 Salvar</button>
+        <button id="saveContent">Salvar</button>
       </div>
     </div>
   </div>
@@ -219,127 +225,121 @@
   <div id="calendarModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>📆 Plano de Estudos</h2>
+        <h2>Plano de Estudos</h2>
         <button class="close" id="closeCalendar">&times;</button>
       </div>
       <div id="calendar"></div>
-      <button id="copyBtn">📋 Copiar</button>
+      <button id="copyBtn">Copiar</button>
     </div>
   </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const tableBody     = document.getElementById('tableBody');
-  const addRowBtn     = document.getElementById('addRowBtn');
-  const contentModal  = document.getElementById('contentModal');
-  const calendarModal = document.getElementById('calendarModal');
-  const mdContent     = document.getElementById('mdContent');
-  const copyBtn       = document.getElementById('copyBtn');
-  let currentRow = null;
-  let calendar   = null;
-  let lastMd     = '';
+  <script>
+  // (mesma lógica JavaScript do original)
+  document.addEventListener('DOMContentLoaded', () => {
+    const tableBody     = document.getElementById('tableBody');
+    const addRowBtn     = document.getElementById('addRowBtn');
+    const contentModal  = document.getElementById('contentModal');
+    const calendarModal = document.getElementById('calendarModal');
+    const mdContent     = document.getElementById('mdContent');
+    const copyBtn       = document.getElementById('copyBtn');
+    let currentRow = null;
+    let calendar   = null;
+    let lastMd     = '';
 
-  function addRow() {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><input type="text" class="disciplina" placeholder="Nome da Disciplina"></td>
-      <td><button class="btn-content">✏️ Inserir</button></td>
-      <td><input type="text" class="date-start" placeholder="DD/MM/AAAA"></td>
-      <td>
-        <button class="btn-plan">▶️ Ver</button>
-        <button class="btn-remove">🗑️ Remover</button>
-      </td>
-    `;
-    tableBody.appendChild(tr);
-    flatpickr(tr.querySelector('.date-start'), { dateFormat: 'd/m/Y' });
-    tr.querySelector('.btn-content').onclick = () => {
-      currentRow = tr;
-      mdContent.value = tr._mdRaw || '';
-      contentModal.style.display = 'flex';
-    };
-    tr.querySelector('.btn-plan').onclick = () => showPlan();
-    tr.querySelector('.btn-remove').onclick = () => {
-      if (confirm('Tem certeza que deseja remover esta disciplina?')) {
-        tr.remove();
-      }
-    };
-  }
-
-  addRowBtn.onclick = addRow;
-  addRow();
-
-  document.getElementById('closeContent').onclick = () => contentModal.style.display = 'none';
-  document.getElementById('saveContent').onclick = () => {
-    const raw = mdContent.value.trim();
-    if (!raw) return alert('Insira a tabela Markdown antes de salvar.');
-    currentRow._mdRaw = raw;
-    const html = marked.parse(raw);
-    const div  = document.createElement('div'); div.innerHTML = html;
-    const rows = Array.from(div.querySelectorAll('tr')).slice(1);
-    currentRow._topics = rows.map(r => {
-      const cols = r.querySelectorAll('td, th');
-      return { title: cols[1].innerText.trim(), hours: parseFloat(cols[2].innerText.trim()) || 1 };
-    });
-    contentModal.style.display = 'none';
-  };
-
-  document.getElementById('closeCalendar').onclick = () => {
-    calendarModal.style.display = 'none';
-    if (calendar) { calendar.destroy(); calendar = null; }
-  };
-
-  function showPlan() {
-    const rows = Array.from(tableBody.querySelectorAll('tr'));
-    const entries = rows.map(tr => ({
-      name:  tr.querySelector('.disciplina').value.trim(),
-      start: tr.querySelector('.date-start').value,
-      topics: tr._topics || []
-    })).filter(e => e.name && e.start && e.topics.length);
-
-    if (!entries.length) {
-      return alert('Preencha ao menos uma disciplina com conteúdos e data inicial.');
+    function addRow() {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" class="disciplina" placeholder="Nome da Disciplina"></td>
+        <td><button class="btn-content">Inserir</button></td>
+        <td><input type="text" class="date-start" placeholder="DD/MM/AAAA"></td>
+        <td>
+          <button class="btn-plan">Ver</button>
+          <button class="btn-remove">Remover</button>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+      flatpickr(tr.querySelector('.date-start'), { dateFormat: 'd/m/Y' });
+      tr.querySelector('.btn-content').onclick = () => {
+        currentRow = tr;
+        mdContent.value = tr._mdRaw || '';
+        contentModal.style.display = 'flex';
+      };
+      tr.querySelector('.btn-plan').onclick = () => showPlan();
+      tr.querySelector('.btn-remove').onclick = () => {
+        if (confirm('Tem certeza que deseja remover esta disciplina?')) tr.remove();
+      };
     }
 
-    let events = [];
-    let md = '| Data | Tópico |\n| --- | --- |\n';
+    addRowBtn.onclick = addRow;
+    addRow();
 
-    entries.forEach(({ start, topics }) => {
-      let date = flatpickr.parseDate(start, 'd/m/Y');
-      topics.forEach(topic => {
-        const iso = date.toISOString().slice(0,10);
-        events.push({ title: topic.title, start: iso, allDay: true });
-        md += `| ${iso} | ${topic.title} |\n`;
-        date.setDate(date.getDate() + 1);
+    document.getElementById('closeContent').onclick = () => contentModal.style.display = 'none';
+    document.getElementById('saveContent').onclick = () => {
+      const raw = mdContent.value.trim();
+      if (!raw) return alert('Insira a tabela Markdown antes de salvar.');
+      currentRow._mdRaw = raw;
+      const html = marked.parse(raw);
+      const div  = document.createElement('div'); div.innerHTML = html;
+      const rows = Array.from(div.querySelectorAll('tr')).slice(1);
+      currentRow._topics = rows.map(r => {
+        const cols = r.querySelectorAll('td, th');
+        return { title: cols[1].innerText.trim(), hours: parseFloat(cols[2].innerText.trim()) || 1 };
       });
-    });
+      contentModal.style.display = 'none';
+    };
 
-    lastMd = md;
-    calendarModal.style.display = 'flex';
-    const calEl = document.getElementById('calendar');
-    if (calendar) { calendar.destroy(); calendar = null; }
-    calendar = new FullCalendar.Calendar(calEl, {
-      locale: 'pt-br',
-      initialView: 'dayGridMonth',
-      headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth' },
-      events
-    });
-    calendar.render();
-  }
+    document.getElementById('closeCalendar').onclick = () => {
+      calendarModal.style.display = 'none';
+      if (calendar) { calendar.destroy(); calendar = null; }
+    };
 
-  copyBtn.onclick = () => {
-    if (!lastMd) return;
-    navigator.clipboard.writeText(lastMd).then(() => {
-      alert('Markdown copiado para a área de transferência!');
-    });
-  };
+    function showPlan() {
+      const rows = Array.from(tableBody.querySelectorAll('tr'));
+      const entries = rows.map(tr => ({
+        name:  tr.querySelector('.disciplina').value.trim(),
+        start: tr.querySelector('.date-start').value,
+        topics: tr._topics || []
+      })).filter(e => e.name && e.start && e.topics.length);
 
-  window.addEventListener('click', e => {
-    if (e.target === contentModal)  contentModal.style.display = 'none';
-    if (e.target === calendarModal) calendarModal.style.display = 'none';
+      if (!entries.length) return alert('Preencha ao menos uma disciplina com conteúdos e data inicial.');
+
+      let events = [];
+      let md = '| Data | Tópico |\n| --- | --- |\n';
+
+      entries.forEach(({ start, topics }) => {
+        let date = flatpickr.parseDate(start, 'd/m/Y');
+        topics.forEach(topic => {
+          const iso = date.toISOString().slice(0,10);
+          events.push({ title: topic.title, start: iso, allDay: true });
+          md += `| ${iso} | ${topic.title} |\n`;
+          date.setDate(date.getDate() + 1);
+        });
+      });
+
+      lastMd = md;
+      calendarModal.style.display = 'flex';
+      const calEl = document.getElementById('calendar');
+      if (calendar) { calendar.destroy(); calendar = null; }
+      calendar = new FullCalendar.Calendar(calEl, {
+        locale: 'pt-br',
+        initialView: 'dayGridMonth',
+        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth' },
+        events
+      });
+      calendar.render();
+    }
+
+    copyBtn.onclick = () => {
+      if (!lastMd) return;
+      navigator.clipboard.writeText(lastMd).then(() => alert('Markdown copiado para a área de transferência!'));
+    };
+
+    window.addEventListener('click', e => {
+      if (e.target === contentModal)  contentModal.style.display = 'none';
+      if (e.target === calendarModal) calendarModal.style.display = 'none';
+    });
   });
-});
-</script>
+  </script>
 
 </body>
 </html>
-
